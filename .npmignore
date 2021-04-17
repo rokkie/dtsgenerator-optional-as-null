@@ -14,12 +14,17 @@ test/
 .gitignore
 .travis.yml
 .nyc_output/
+.tsconfig.json
+.eslint.json
+.nycrc
+.prettierrc
 build/
 coverage/
 demo/
 greenkeeper.json
 *.tsbuildinfo
 *.iml
+*.js.map
 
 npm-debug.log
 
