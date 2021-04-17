@@ -1,4 +1,4 @@
-# dtsgenerator-undefined-as-null
+# dtsgenerator-optional-as-null
 
 This is a `dtsgenerator` plugin.
 
@@ -7,7 +7,7 @@ Transform all the typescript optional fields to a union with the original type a
 # Install
 
 ```
-npm install dtsgenerator-undefined-as-null
+npm install dtsgenerator-optional-as-null
 ```
 
 # Usage
