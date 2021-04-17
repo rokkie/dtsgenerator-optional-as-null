@@ -1,0 +1,25 @@
+.git/
+.vscode/
+.idea/
+
+# for npm
+node_modules/
+
+# codes
+test/
+
+# misc
+.coveralls.yml
+.editorconfig
+.gitignore
+.travis.yml
+.nyc_output/
+build/
+coverage/
+demo/
+greenkeeper.json
+*.tsbuildinfo
+*.iml
+
+npm-debug.log
+

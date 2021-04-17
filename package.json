@@ -1,0 +1,48 @@
+{
+  "name": "dtsgenerator-optional-as-null",
+  "version": "0.1.0",
+  "description": "DTS generator plugin that turns optional fields into nullable fields",
+  "main": "index.js",
+  "author": "Rocco Bruyn <rocco.bruyn@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rokkie/dtsgenerator-optional-as-null"
+  },
+  "scripts": {
+    "clean": "rimraf index.js test/**/*.js *.tsbuildinfo",
+    "lint": "eslint *.ts **/*.ts",
+    "lint:fix": "npm run lint -- --fix",
+    "precompile": "npm run lint",
+    "compile": "tsc -p .",
+    "watch": "npm run compile -- -w",
+    "build": "npm run compile",
+    "do-test": "cross-env TS_NODE_FILES=true mocha --exit --require ts-node/register --colors test/*_test.ts",
+    "test": "nyc npm run do-test",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "test:update-snapshot": "UPDATE_SNAPSHOT=1 npm run do-test"
+  },
+  "keywords": [
+    "dtsgenerator",
+    "dtsgenerator-plugin"
+  ],
+  "dependencies": {
+    "dtsgenerator": "^3.9.1",
+    "tslib": "^2.2.0"
+  },
+  "devDependencies": {
+    "@types/mocha": "^8.2.2",
+    "@types/node": "^14.14.41",
+    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/parser": "^4.22.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^7.24.0",
+    "eslint-config-prettier": "^8.2.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "mocha": "^8.3.2",
+    "nyc": "^15.1.0",
+    "prettier": "^2.2.1",
+    "rimraf": "^3.0.2",
+    "ts-node": "^9.1.1"
+  }
+}
