@@ -15,9 +15,24 @@ npm install dtsgenerator-optional-as-null
 `dtsgen.json`
 ```json
 {
-    "plugins": {
-        "dtsgenerator-optional-as-null": true // or { config object }
+  "plugins": {
+    "dtsgenerator-optional-as-null": true
+  }
+}
+```
+or
+```json
+{
+  "plugins": {
+    "dtsgenerator-optional-as-null": {
+      "keepOptionals": true,
+      "exclude": [
+        "patterns",
+        "to",
+        "exclude"
+      ]
     }
+  }
 }
 ```
 
@@ -28,13 +43,15 @@ npm install dtsgenerator-optional-as-null
 - the type of configuration
 ```ts
 type Config = {
-  exclude: string[], // list of regex patterns of filenames to exclude
+  exclude: string[]; // list of regex patterns of filenames to exclude
+  keepOptionals: boolean; // if optionals should be kept, defaults to `false`
 };
 ```
 
 - Example
 ```json
 {
+  "keepOptionals": true,
   "exclude": [
     "Petstore",
     "(Corp|Internal)Api"

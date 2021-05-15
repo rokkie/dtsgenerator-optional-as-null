@@ -27,6 +27,9 @@ const isLiteralNull = (typeNode: ts.TypeNode) =>
  * This `postProcess` is the hook for the output AST changing.
  */
 async function postProcess(pluginContext: PluginContext): Promise<ts.TransformerFactory<ts.SourceFile> | undefined> {
+  const option = pluginContext.option;
+  const keepOptionals = typeof option !== 'boolean' && option.keepOptionals === true;
+
   return (context: ts.TransformationContext) => (root: ts.SourceFile): ts.SourceFile => {
     const visit = (node: ts.Node): ts.Node => {
       // visit all the child nodes recursively
@@ -40,6 +43,7 @@ async function postProcess(pluginContext: PluginContext): Promise<ts.Transformer
           updateUnionTypeNode,
           createNodeArray,
           updatePropertySignature,
+          createToken,
         } = context.factory;
 
         // create a literal `null` type node
@@ -64,15 +68,17 @@ async function postProcess(pluginContext: PluginContext): Promise<ts.Transformer
               createUnionTypeNode([node.type, nullNode]);
         }
 
-        // update the property signature leaving out the question token and set the type to the union containing the `null`
-        return updatePropertySignature(node, node.modifiers, node.name, undefined, maybeType);
+        // create question token if optionals should be kept
+        const questionToken = keepOptionals ? createToken(SyntaxKind.QuestionToken) : undefined;
+
+        // update the property signature with the question token as configured and set the type to the union containing the `null`
+        return updatePropertySignature(node, node.modifiers, node.name, questionToken, maybeType);
       }
 
       // not a property signature so do nothing
       return node;
     };
 
-    const option = pluginContext.option;
     const excluded =
       typeof option !== 'boolean' &&
       Array.isArray(option.exclude) &&
