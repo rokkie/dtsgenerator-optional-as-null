@@ -30,63 +30,64 @@ async function postProcess(pluginContext: PluginContext): Promise<ts.Transformer
   const option = pluginContext.option;
   const keepOptionals = typeof option !== 'boolean' && option.keepOptionals === true;
 
-  return (context: ts.TransformationContext) => (root: ts.SourceFile): ts.SourceFile => {
-    const visit = (node: ts.Node): ts.Node => {
-      // visit all the child nodes recursively
-      node = ts.visitEachChild(node, visit, context);
+  return (context: ts.TransformationContext) =>
+    (root: ts.SourceFile): ts.SourceFile => {
+      const visit = (node: ts.Node): ts.Node => {
+        // visit all the child nodes recursively
+        node = ts.visitEachChild(node, visit, context);
 
-      // check if the node is a property signature with a question token (meaning is it optional)
-      if (ts.isPropertySignature(node) && node.questionToken && node.type) {
-        const {
-          createLiteralTypeNode,
-          createUnionTypeNode,
-          updateUnionTypeNode,
-          createNodeArray,
-          updatePropertySignature,
-          createToken,
-          createNull,
-        } = context.factory;
+        // check if the node is a property signature with a question token (meaning is it optional)
+        if (ts.isPropertySignature(node) && node.questionToken && node.type) {
+          const {
+            createLiteralTypeNode,
+            createUnionTypeNode,
+            updateUnionTypeNode,
+            createNodeArray,
+            updatePropertySignature,
+            createToken,
+            createNull,
+          } = context.factory;
 
-        // create a literal `null` type node
-        const nullNode = createLiteralTypeNode(createNull());
+          // create a literal `null` type node
+          const nullNode = createLiteralTypeNode(createNull());
 
-        let maybeType: ts.TypeNode;
+          let maybeType: ts.TypeNode;
 
-        // if the type node is already a union type
-        if (ts.isUnionTypeNode(node.type)) {
-          // if the union already contains a `null` literal
-          maybeType = node.type.types.some(isLiteralNull)
-            ? // use the original union
-              node.type
-            : // otherwise add `null` to the union
-              updateUnionTypeNode(node.type, createNodeArray([...node.type.types, nullNode]));
-        } else {
-          // if the type node is already a `null` literal
-          maybeType = isLiteralNull(node.type)
-            ? // use the original type node
-              node.type
-            : // otherwise create a union with the original type node and a `null` literal
-              createUnionTypeNode([node.type, nullNode]);
+          // if the type node is already a union type
+          if (ts.isUnionTypeNode(node.type)) {
+            // if the union already contains a `null` literal
+            maybeType = node.type.types.some(isLiteralNull)
+              ? // use the original union
+                node.type
+              : // otherwise add `null` to the union
+                updateUnionTypeNode(node.type, createNodeArray([...node.type.types, nullNode]));
+          } else {
+            // if the type node is already a `null` literal
+            maybeType = isLiteralNull(node.type)
+              ? // use the original type node
+                node.type
+              : // otherwise create a union with the original type node and a `null` literal
+                createUnionTypeNode([node.type, nullNode]);
+          }
+
+          // create question token if optionals should be kept
+          const questionToken = keepOptionals ? createToken(SyntaxKind.QuestionToken) : undefined;
+
+          // update the property signature with the question token as configured and set the type to the union containing the `null`
+          return updatePropertySignature(node, node.modifiers, node.name, questionToken, maybeType);
         }
 
-        // create question token if optionals should be kept
-        const questionToken = keepOptionals ? createToken(SyntaxKind.QuestionToken) : undefined;
+        // not a property signature so do nothing
+        return node;
+      };
 
-        // update the property signature with the question token as configured and set the type to the union containing the `null`
-        return updatePropertySignature(node, node.modifiers, node.name, questionToken, maybeType);
-      }
+      const excluded =
+        typeof option !== 'boolean' &&
+        Array.isArray(option.exclude) &&
+        option.exclude.some((pattern) => new RegExp(pattern).test(root.fileName));
 
-      // not a property signature so do nothing
-      return node;
+      return excluded ? root : ts.visitNode(root, visit);
     };
-
-    const excluded =
-      typeof option !== 'boolean' &&
-      Array.isArray(option.exclude) &&
-      option.exclude.some((pattern) => new RegExp(pattern).test(root.fileName));
-
-    return excluded ? root : ts.visitNode(root, visit);
-  };
 }
 
 export default plugin;
