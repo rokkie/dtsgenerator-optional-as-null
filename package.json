@@ -1,6 +1,6 @@
 {
   "name": "dtsgenerator-optional-as-null",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "DTS generator plugin that turns optional fields into nullable fields",
   "main": "index.js",
   "author": "Rocco Bruyn <rocco.bruyn@gmail.com>",
