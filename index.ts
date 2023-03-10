@@ -44,10 +44,11 @@ async function postProcess(pluginContext: PluginContext): Promise<ts.Transformer
           createNodeArray,
           updatePropertySignature,
           createToken,
+          createNull,
         } = context.factory;
 
         // create a literal `null` type node
-        const nullNode = createLiteralTypeNode(ts.createNull());
+        const nullNode = createLiteralTypeNode(createNull());
 
         let maybeType: ts.TypeNode;
 
